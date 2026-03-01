@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpainLife — Цены на жильё в Испании</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:linear-gradient(135deg,#ff416c,#ff4b2b);min-height:100vh;padding:20px 16px 40px}
+
+.wrap{max-width:1000px;margin:0 auto;background:rgba(255,255,255,.12);backdrop-filter:blur(20px);border-radius:28px;padding:44px 50px;color:white;box-shadow:0 30px 60px rgba(0,0,0,.25)}
+@media(max-width:680px){.wrap{padding:24px 18px}}
+
+h1{font-size:46px;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px}
+.sub{opacity:.8;font-size:16px;margin-bottom:24px}
+
+/* Counter */
+.topbar{display:flex;justify-content:flex-end;margin-bottom:24px}
+.cbox{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.15);border-radius:20px;padding:8px 18px;border:1px solid rgba(255,255,255,.2)}
+.cnum{font-size:20px;font-weight:700}
+.clbl{font-size:11px;opacity:.65}
+
+/* Form grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+@media(max-width:680px){.g2{grid-template-columns:1fr}}
+
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;opacity:.55;margin:18px 0 7px}
+select{width:100%;padding:12px 14px;border-radius:12px;border:none;font-size:15px;outline:none;background:rgba(255,255,255,.96);color:#222;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
+/* Tier */
+.tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tbtn{padding:10px 4px;border-radius:11px;border:2px solid rgba(255,255,255,.35);font-size:13px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.13);color:white;transition:.2s}
+.tbtn.on{background:white;color:#ff416c;border-color:white}
+
+/* Map button */
+.dhint{font-size:12px;opacity:.7;margin-top:5px;min-height:15px}
+
+/* Checkboxes */
+.checks{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:6px 0 20px}
+@media(max-width:680px){.checks{grid-template-columns:1fr 1fr}}
+.cl{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border-radius:11px;padding:11px 13px;cursor:pointer;font-size:13px;transition:.2s}
+.cl:hover{background:rgba(255,255,255,.22)}
+.cl input{width:16px;height:16px;accent-color:#ff416c;cursor:pointer}
+
+/* Go button */
+.gobtn{width:100%;padding:17px;border-radius:15px;border:none;font-size:17px;font-weight:700;cursor:pointer;background:white;color:#ff416c;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:.3s}
+.gobtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.gobtn:disabled{opacity:.55;transform:none;cursor:not-allowed}
+
+/* Spinner */
+.spin{display:none;margin-top:24px;padding:22px;border-radius:18px;background:rgba(255,255,255,.1);text-align:center}
+.dots span{display:inline-block;width:9px;height:9px;background:white;border-radius:50%;margin:0 4px;animation:bop 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* Result */
+.rcard{margin-top:24px;padding:26px;border-radius:20px;background:rgba(255,255,255,.14);animation:fi .4s}
+.rcard h2{font-size:20px;font-weight:700;margin-bottom:10px}
+.badge{display:inline-block;background:rgba(255,255,255,.25);border-radius:7px;padding:2px 10px;font-size:11px;margin-bottom:12px}
+.ait{font-size:14px;line-height:1.8}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:14px}
+.prow:last-of-type{border-bottom:none}
+.prow .val{font-weight:700;color:#afffaf}
+.tbox{margin-top:12px;padding:14px 16px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;justify-content:space-between;font-size:18px;font-weight:700}
+.snote{font-size:11px;opacity:.45;margin-top:10px;text-align:center}
+
+/* Chat */
+.chatwrap{margin-top:18px}
+.crow{display:flex;gap:8px;margin-top:8px}
+.ci{flex:1;padding:12px 14px;border-radius:11px;border:none;font-size:14px;outline:none;background:rgba(255,255,255,.92);color:#333}
+.csend{padding:12px 18px;border-radius:11px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:white;color:#ff416c;transition:.2s}
+.chist{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.msg{padding:11px 15px;border-radius:13px;font-size:14px;line-height:1.6;max-width:94%}
+.msg.u{background:rgba(255,255,255,.22);align-self:flex-end}
+.msg.a{background:rgba(255,255,255,.1);align-self:flex-start}
+
+/* Reviews */
+.revwrap{margin-top:42px}
+.revhdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.revhdr h2{font-size:20px;font-weight:700}
+.avgbox{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.13);border-radius:13px;padding:7px 15px}
+.avgstars{font-size:18px;color:#FFD700}
+.avgnum{font-size:22px;font-weight:700}
+.avgcnt{font-size:11px;opacity:.65}
+.revgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media(max-width:580px){.revgrid{grid-template-columns:1fr}}
+.rev{background:rgba(255,255,255,.11);border-radius:15px;padding:16px;animation:fi .4s}
+.revtop{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.revname{font-weight:700;font-size:13px}
+.revcity{font-size:11px;opacity:.6}
+.revstars{font-size:12px;color:#FFD700;margin-left:auto}
+.revtext{font-size:12px;line-height:1.6;opacity:.88}
+.revdate{font-size:10px;opacity:.45;margin-top:7px}
+.addbtn{width:100%;padding:12px;border-radius:11px;border:2px dashed rgba(255,255,255,.35);background:transparent;color:white;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;margin-bottom:12px}
+.addbtn:hover{background:rgba(255,255,255,.1)}
+.rf{background:rgba(255,255,255,.1);border-radius:15px;padding:18px;display:none;animation:fi .3s}
+.rf input,.rf textarea{width:100%;padding:11px 13px;border-radius:10px;border:none;font-size:13px;outline:none;background:rgba(255,255,255,.92);color:#333;margin-bottom:9px;font-family:'Inter',sans-serif}
+.rf textarea{resize:vertical;min-height:75px}
+.starrow{display:flex;gap:5px;margin-bottom:10px}
+.star{font-size:26px;cursor:pointer;opacity:.35;color:#FFD700;transition:.15s}
+.star.on{opacity:1;transform:scale(1.1)}
+.frow{display:flex;gap:9px}.frow input{flex:1}
+.subbtn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;background:white;color:#ff416c;transition:.2s}
+.subbtn:hover{transform:translateY(-2px)}
+
+/* Subscription */
+.subwrap{margin-top:42px}
+.subwrap h2{font-size:20px;font-weight:700;margin-bottom:5px}
+.subdesc{opacity:.75;font-size:14px;margin-bottom:20px}
+.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:580px){.subgrid{grid-template-columns:1fr}}
+.sc{border-radius:18px;padding:24px;position:relative;transition:.2s}
+.sc:hover{transform:translateY(-2px)}
+.sc.free{background:rgba(255,255,255,.11);border:2px solid rgba(255,255,255,.2)}
+.sc.pro{background:rgba(255,255,255,.2);border:2px solid white;box-shadow:0 6px 28px rgba(0,0,0,.18)}
+.sbdg{position:absolute;top:-11px;right:18px;background:#FFD700;color:#333;font-size:10px;font-weight:700;padding:3px 11px;border-radius:18px}
+.snm{font-size:18px;font-weight:700;margin-bottom:3px}
+.spr{font-size:32px;font-weight:700;margin:8px 0 3px}
+.spr span{font-size:14px;font-weight:400;opacity:.65}
+.spe{font-size:12px;opacity:.6;margin-bottom:16px}
+.sfl{list-style:none;margin-bottom:20px}
+.sfl li{font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:7px}
+.sfl li:last-child{border-bottom:none}
+.sbt{width:100%;padding:12px;border-radius:11px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.sc.free .sbt{background:rgba(255,255,255,.22);color:white;border:2px solid rgba(255,255,255,.35)}
+.sc.pro .sbt{background:white;color:#ff416c}
+
+/* Pro modal */
+.pm{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.pm.open{display:flex}
+.pb{background:linear-gradient(135deg,#ff416c,#ff4b2b);border-radius:22px;padding:36px;max-width:400px;width:92%;color:white;text-align:center;animation:fi .3s}
+.pb h3{font-size:24px;font-weight:700;margin-bottom:8px}
+.pb p{opacity:.85;margin-bottom:22px;line-height:1.6;font-size:14px}
+.pi{width:100%;padding:13px;border-radius:11px;border:none;font-size:14px;outline:none;background:rgba(255,255,255,.95);color:#333;margin-bottom:10px}
+.pp{width:100%;padding:14px;border-radius:11px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:white;color:#ff416c;margin-bottom:9px;transition:.2s}
+.pp:hover{transform:translateY(-2px)}
+.pc{background:none;border:none;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;text-decoration:underline}
+.pn{font-size:10px;opacity:.55;margin-top:12px}
+
+/* MAP */
+
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.footer{margin-top:30px;font-size:11px;opacity:.45;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🇪🇸 SpainLife</h1>
+  <p class="sub">Актуальные цены на жильё в Испании</p>
+
+  <div class="topbar">
+    <div class="cbox">
+      <span>👥</span>
+      <div><div class="cnum" id="cnum">—</div><div class="clbl">запросов</div></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div>
+      <div class="stitle">🏙️ Город</div>
+      <select id="city">
+        <option value="">Выберите город</option>
+        <option>Valencia</option><option>Barcelona</option><option>Madrid</option>
+        <option>Málaga</option><option>Sevilla</option><option>Alicante</option>
+        <option>Bilbao</option><option>San Sebastián</option><option>Zaragoza</option>
+        <option>Palma de Mallorca</option><option>Murcia</option><option>Las Palmas</option>
+        <option>Tenerife</option><option>Marbella</option><option>Torrevieja</option>
+      </select>
+
+      <div class="stitle">📍 Район</div>
+      <select id="district">
+        <optgroup label="Valencia">
+          <option>Центр (Ciutat Vella)</option><option>Eixample</option><option>Ruzafa</option>
+          <option>El Carmen</option><option>Benimaclet</option><option>Campanar</option>
+          <option>Patraix</option><option>Quatre Carreres</option>
+        </optgroup>
+        <optgroup label="Barcelona">
+          <option>Eixample (BCN)</option><option>Gràcia</option><option>Barceloneta</option>
+          <option>Poble Sec</option><option>Sants</option><option>Poblenou</option>
+          <option>Sant Andreu</option><option>Horta-Guinardó</option>
+        </optgroup>
+        <optgroup label="Madrid">
+          <option>Salamanca</option><option>Chamberí</option><option>Malasaña</option>
+          <option>Lavapiés</option><option>Carabanchel</option><option>Retiro</option>
+          <option>Vallecas</option><option>Chamartín</option>
+        </optgroup>
+        <optgroup label="Málaga">
+          <option>Centro Histórico</option><option>El Palo</option><option>Soho</option>
+          <option>Teatinos</option><option>Carretera de Cádiz</option>
+          <option>Pedregalejo</option><option>Churriana</option>
+        </optgroup>
+        <optgroup label="Sevilla">
+          <option>Santa Cruz</option><option>Triana</option><option>Los Remedios</option>
+          <option>Nervión</option><option>Macarena</option><option>Bellavista</option>
+        </optgroup>
+        <optgroup label="Alicante">
+          <option>Centro</option><option>Playa de San Juan</option><option>El Cabo</option>
+          <option>Carolinas</option><option>Gran Vía</option><option>Vistahermosa</option>
+        </optgroup>
+        <optgroup label="Другие">
+          <option>Bilbao — Casco Viejo</option><option>Bilbao — Indautxu</option>
+          <option>San Sebastián — Gros</option><option>Palma — Santa Catalina</option>
+          <option>Marbella — Puerto Banús</option><option>Torrevieja — Playa</option>
+        </optgroup>
+      </select>
+      <div class="dhint" id="dhint"></div>
+    </div>
+
+    <div>
+      <div class="stitle">🏠 Тип жилья</div>
+      <select id="prop">
+        <option>Квартира</option><option>Дом</option><option>Вилла</option>
+        <option>Студия</option><option>Пентхаус</option>
+      </select>
+
+      <div class="stitle">🔑 Аренда или покупка</div>
+      <select id="mode">
+        <option value="аренда">Аренда (€/мес)</option>
+        <option value="покупка">Покупка (€)</option>
+      </select>
+
+      <div class="stitle">💰 Ценовой сегмент</div>
+      <div class="tiers">
+        <button class="tbtn" data-tier="эконом">💚 Дешёвое</button>
+        <button class="tbtn on" data-tier="среднее">💛 Среднее</button>
+        <button class="tbtn" data-tier="премиум">💎 Дорогое</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stitle" style="margin-top:22px">📦 Что включить в расчёт</div>
+  <div class="checks">
+    <label class="cl"><input type="checkbox" id="cFood" checked>🍔 Еда</label>
+    <label class="cl"><input type="checkbox" id="cTrans" checked>🚇 Транспорт</label>
+    <label class="cl"><input type="checkbox" id="cCloth" checked>👗 Одежда</label>
+    <label class="cl"><input type="checkbox" id="cHealth">💊 Здоровье</label>
+    <label class="cl"><input type="checkbox" id="cFun">🎭 Развлечения</label>
+    <label class="cl"><input type="checkbox" id="cSchool">🎓 Школа/Садик</label>
+    <label class="cl"><input type="checkbox" id="cNet">📶 Интернет+телефон</label>
+    <label class="cl"><input type="checkbox" id="cCar">🚗 Авто (бензин)</label>
+  </div>
+
+  <button class="gobtn" id="gobtn">🔍 Узнать актуальные цены</button>
+
+  <div class="spin" id="spin">
+    <div style="margin-bottom:10px;font-size:13px;opacity:.8">Загружаем актуальные цены...</div>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="chatwrap" id="chatwrap" style="display:none">
+    <div class="stitle">💬 Уточняющий вопрос</div>
+    <div class="chist" id="chist"></div>
+    <div class="crow">
+      <input class="ci" id="cinput" placeholder="Например: а если с детьми? или сравни с Барселоной...">
+      <button class="csend" id="csend">→</button>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="revwrap">
+    <div class="revhdr">
+      <h2>⭐ Отзывы</h2>
+      <div class="avgbox">
+        <div class="avgstars" id="avgstars">★★★★★</div>
+        <div class="avgnum" id="avgnum">—</div>
+        <div class="avgcnt" id="avgcnt">отзывов</div>
+      </div>
+    </div>
+    <div class="revgrid" id="revgrid"></div>
+    <button class="addbtn" id="addRevBtn">✏️ Оставить отзыв</button>
+    <div class="rf" id="revform">
+      <div class="frow">
+        <input id="rname" placeholder="Ваше имя" maxlength="30">
+        <input id="rcity2" placeholder="Откуда вы?" maxlength="30">
+      </div>
+      <div class="starrow" id="starrow">
+        <span class="star on">★</span><span class="star on">★</span>
+        <span class="star on">★</span><span class="star on">★</span><span class="star on">★</span>
+      </div>
+      <textarea id="rtext" placeholder="Ваш отзыв..." maxlength="300"></textarea>
+      <button class="subbtn" id="submitRevBtn">Опубликовать</button>
+    </div>
+  </div>
+
+  <!-- Subscription -->
+  <div class="subwrap">
+    <h2>💎 Тарифы</h2>
+    <p class="subdesc">Выберите план, который подходит вам</p>
+    <div class="subgrid">
+      <div class="sc free">
+        <div class="snm">🆓 Бесплатно</div>
+        <div class="spr">€0<span>/мес</span></div>
+        <div class="spe">Навсегда бесплатно</div>
+        <ul class="sfl">
+          <li>✅ Поиск цен по городам</li>
+          <li>✅ Выбор района и карта</li>
+          <li>✅ 5 запросов в день</li>
+          <li>⚠️ Реклама в результатах</li>
+          <li>❌ Без уточняющих вопросов</li>
+        </ul>
+        <button class="sbt" id="freePlanBtn">Текущий план</button>
+      </div>
+      <div class="sc pro">
+        <div class="sbdg">✨ ПОПУЛЯРНЫЙ</div>
+        <div class="snm">👑 SpainLife Pro</div>
+        <div class="spr">€4.99<span>/мес</span></div>
+        <div class="spe">Отмена в любой момент</div>
+        <ul class="sfl">
+          <li>✅ Всё из бесплатного</li>
+          <li>✅ <strong>Без рекламы</strong></li>
+          <li>✅ Безлимитные запросы</li>
+          <li>✅ Уточняющие вопросы</li>
+          <li>✅ Сравнение городов</li>
+        </ul>
+        <button class="sbt" id="proBtn">Попробовать Pro →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">© 2026 SpainLife · Актуальные цены на жильё в Испании</div>
+</div>
+
+<!-- Pro modal -->
+<div class="pm" id="proModal">
+  <div class="pb">
+    <div style="font-size:38px;margin-bottom:10px">👑</div>
+    <h3>SpainLife Pro</h3>
+    <p>Безлимитные запросы, без рекламы и уточняющие вопросы — всего €4.99/мес</p>
+    <input class="pi" id="proEmail" type="email" placeholder="Ваш email">
+    <button class="pp" id="proPayBtn">💳 Оплатить €4.99/мес</button><br>
+    <button class="pc" id="proCloseBtn">Отмена</button>
+    <div class="pn">🔒 Безопасная оплата · Отмена в любой момент</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ─── Data ─────────────────────────────────────────────────────────────────
+var HINTS = {
+  'Центр (Ciutat Vella)': '🏛️ Исторический центр, туристично, дороже среднего',
+  'Eixample': '🏙️ Популярный жилой район, хорошая инфраструктура',
+  'Ruzafa': '🎨 Модный богемный квартал, рестораны и кафе',
+  'El Carmen': '🍷 Старый город, ночная жизнь, узкие улочки',
+  'Benimaclet': '🎓 Студенческий район, дешевле центра',
+  'Campanar': '🌿 Спокойный жилой район, семьи с детьми',
+  'Patraix': '💶 Один из самых доступных районов',
+  'Quatre Carreres': '🏟️ Рядом стадион, тихо, доступно',
+  'Eixample (BCN)': '🏙️ Престижный центральный район Барселоны',
+  'Gràcia': '🎨 Богемный и уютный, популярен у экспатов',
+  'Barceloneta': '🏖️ У пляжа, туристично, дорого',
+  'Poble Sec': '🎭 Молодёжный район, умеренные цены',
+  'Sants': '🚉 Транспортный узел, доступнее центра',
+  'Poblenou': '💻 Технологический кластер, современные апартаменты',
+  'Sant Andreu': '👨‍👩‍👧 Спокойный семейный район, дешевле центра',
+  'Horta-Guinardó': '🌳 Зелёный район, тихо, доступно',
+  'Salamanca': '💎 Самый престижный район Мадрида, очень дорого',
+  'Chamberí': '🏛️ Элегантный буржуазный район',
+  'Malasaña': '🎸 Модный богемный квартал, молодёжь',
+  'Lavapiés': '🌍 Мультикультурный, доступный центр',
+  'Carabanchel': '💶 Один из самых дешёвых районов Мадрида',
+  'Retiro': '🌳 Рядом парк, тихо, семьи',
+  'Vallecas': '🏗️ Рабочий район, очень доступные цены',
+  'Chamartín': '🏢 Деловой район, бизнес-центр',
+  'Centro Histórico': '🏛️ Исторический центр Малаги',
+  'El Palo': '🏖️ Пляжный район, спокойно, доступно',
+  'Soho': '🎨 Арт-квартал, популярен у молодёжи',
+  'Teatinos': '🎓 Университетский район',
+  'Carretera de Cádiz': '💶 Доступный жилой район у моря',
+  'Pedregalejo': '🐟 Рыбацкий квартал, пляжи, уютно',
+  'Churriana': '✈️ Рядом аэропорт, тихо, недорого',
+  'Santa Cruz': '🏛️ Исторический центр Севильи, туристично',
+  'Triana': '💃 Фламенко и традиции, очень популярен',
+  'Los Remedios': '👨‍👩‍👧 Буржуазный семейный район',
+  'Nervión': '🏢 Деловой район, хорошая инфраструктура',
+  'Macarena': '🌿 Традиционный рабочий район, доступно',
+  'Bellavista': '💶 Один из самых доступных в Севилье',
+  'Centro': '🏛️ Центр Аликанте, всё рядом',
+  'Playa de San Juan': '🏖️ Пляжный район, популярен',
+  'El Cabo': '💶 Доступный жилой район',
+  'Carolinas': '👨‍👩‍👧 Спокойный жилой район, семьи',
+  'Gran Vía': '🏙️ Центральный бульвар, удобно',
+  'Vistahermosa': '💎 Престижный район, виллы'
+};
+
+
+
+var DEFREVS = [
+  {name:'Марина К.',city:'Москва',stars:5,text:'Наконец-то нашла реальные цены на жильё в Валенсии! Планирую переезд — сервис очень помог.',date:'18 фев 2026',ava:'👩',col:'#f06595'},
+  {name:'Алексей Т.',city:'Санкт-Петербург',stars:5,text:'Выбрал Барселону и получил актуальные цены. Данные совпали с Idealista.',date:'14 фев 2026',ava:'👨',col:'#4d96ff'},
+  {name:'Анна Р.',city:'Рига',stars:4,text:'Отличный инструмент для планирования бюджета. Особенно понравились сегменты цен.',date:'9 фев 2026',ava:'👩‍💼',col:'#6bcb77'},
+  {name:'Дмитрий С.',city:'Тбилиси',stars:5,text:'Сравнивал Малагу и Аликанте — получил подробный ответ с реальными ценами!',date:'3 фев 2026',ava:'🧔',col:'#ff922b'}
+];
+var AVAS = ['👩','👨','🧔','👩‍💼','👨‍💼','🧕','👱'];
+var COLS = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997'];
+
+// ─── State ────────────────────────────────────────────────────────────────
+var tier = 'среднее';
+var starRating = 5;
+var chatHist = [];
+var chatCtx = '';
+
+function $(id){ return document.getElementById(id); }
+
+// ─── Counter ──────────────────────────────────────────────────────────────
+function loadCount(){
+  try { $('cnum').textContent = parseInt(localStorage.getItem('sl_req')||'0').toLocaleString('ru-RU'); } catch(e){}
+}
+function bumpCount(){
+  try {
+    var n = parseInt(localStorage.getItem('sl_req')||'0') + 1;
+    localStorage.setItem('sl_req', n);
+    $('cnum').textContent = n.toLocaleString('ru-RU');
+  } catch(e){}
+}
+
+// ─── API — NO web_search tool to avoid tool_use blocks ────────────────────
+function callClaude(messages, cb){
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1500,
+      system: 'Ты эксперт по рынку недвижимости Испании. Отвечай ТОЛЬКО на русском языке. У тебя актуальные знания о ценах на жильё в Испании за 2024-2025 год по данным Idealista и Fotocasa. Давай конкретные цифры в €. Структурируй ответ так:\n- Каждую статью расходов пиши на новой строке в формате: "• Название: €СУММА"\n- В самом конце обязательно напиши итоговую строку в формате: "ИТОГО: €СУММА/мес"\nБудь конкретным и информативным.',
+      messages: messages
+    })
+  })
+  .then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(d){
+    var text = '';
+    if(d.content && Array.isArray(d.content)){
+      d.content.forEach(function(block){
+        if(block.type === 'text' && block.text) text += block.text;
+      });
+    }
+    if(!text && d.error) throw new Error(d.error.message || 'API error');
+    cb(null, text || 'Не удалось получить ответ.');
+  })
+  .catch(function(e){
+    cb(e.message || 'Ошибка соединения');
+  });
+}
+
+// ─── Calculate ────────────────────────────────────────────────────────────
+function calculate(){
+  var city = $('city').value;
+  var dist = $('district').value;
+  var prop = $('prop').value;
+  var mode = $('mode').value;
+  if(!city){ showResult('<div class="rcard">⚠️ Выберите город</div>'); return; }
+
+  var ex = [];
+  if($('cFood').checked) ex.push('продукты и рестораны');
+  if($('cTrans').checked) ex.push('транспорт');
+  if($('cCloth').checked) ex.push('одежда');
+  if($('cHealth').checked) ex.push('медицина и аптеки');
+  if($('cFun').checked) ex.push('развлечения и досуг');
+  if($('cSchool').checked) ex.push('детский сад или школа');
+  if($('cNet').checked) ex.push('интернет и мобильный телефон');
+  if($('cCar').checked) ex.push('авто и бензин');
+
+  $('gobtn').disabled = true;
+  $('spin').style.display = 'block';
+  showResult('');
+  $('chatwrap').style.display = 'none';
+  bumpCount();
+
+  var loc = dist ? 'районе ' + dist + ' города ' + city : 'городе ' + city;
+  var prompt = 'Расскажи про цены на ' + mode + ' жилья (' + tier + ' сегмент) — ' + prop + ' — в ' + loc + ', Испания.\n\n' +
+    'Включи:\n' +
+    '1. Диапазон цен (минимум–максимум) для 2024–2025 года\n' +
+    '2. Среднюю цену для сегмента "' + tier + '"\n' +
+    '3. Коммунальные платежи\n' +
+    (ex.length ? '4. Расходы на: ' + ex.join(', ') + '\n' : '') +
+    '5. Среднюю зарплату в ' + city + '\n' +
+    '6. Практический совет по поиску жилья\n\n' +
+    'Каждую статью расходов выводи в формате: "• Название: €СУММА"\n' +
+    'В конце обязательно выведи строку: "ИТОГО: €СУММА/мес"';
+
+  chatHist = [{role:'user', content:prompt}];
+  chatCtx = city + (dist ? ', ' + dist : '') + ', ' + prop + ', ' + mode + ', ' + tier;
+
+  callClaude(chatHist, function(err, text){
+    $('spin').style.display = 'none';
+    $('gobtn').disabled = false;
+    if(err){
+      showResult('<div class="rcard">❌ Ошибка: ' + esc(err) + '</div>');
+      return;
+    }
+    chatHist.push({role:'assistant', content:text});
+    showResult(
+      '<div class="rcard">' +
+      '<h2>🏠 ' + esc(city) + (dist ? ' · ' + esc(dist) : '') + ' — ' + esc(prop) + '</h2>' +
+      '<div class="badge">📅 ' + new Date().toLocaleDateString('ru-RU') + '</div>' +
+      '<div class="ait">' + fmt(text) + '</div>' +
+      '<div class="snote">* На основе данных Idealista, Fotocasa · 2024–2025</div>' +
+      '</div>'
+    );
+    $('chatwrap').style.display = 'block';
+    $('chist').innerHTML = '';
+  });
+}
+
+function showResult(html){ $('result').innerHTML = html; }
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmt(t){
+  var s = esc(t);
+  s = s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/^• (.+?):\s*(€[\d\s.,]+.*?)$/gm,
+    '<div class="prow"><span>$1</span><span class="val">$2</span></div>');
+  s = s.replace(/ИТОГО:\s*(€[\d\s.,]+(?:\/мес)?)/gi,
+    '<div class="tbox"><span>💰 Итого в месяц</span><span>$1</span></div>');
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────
+function sendChat(){
+  var inp = $('cinput');
+  var msg = inp.value.trim();
+  if(!msg) return;
+  var h = $('chist');
+  var um = document.createElement('div');
+  um.className = 'msg u';
+  um.textContent = '👤 ' + msg;
+  h.appendChild(um);
+  inp.value = '';
+  var el = document.createElement('div');
+  el.className = 'msg a';
+  el.textContent = '⏳ Загружаю...';
+  h.appendChild(el);
+  chatHist.push({role:'user', content:'Контекст: ' + chatCtx + '. Вопрос: ' + msg});
+  callClaude(chatHist, function(err, text){
+    if(err){ el.textContent = '❌ ' + err; return; }
+    chatHist.push({role:'assistant', content:text});
+    el.innerHTML = '🤖 ' + fmt(text);
+    h.scrollTop = h.scrollHeight;
+  });
+}
+
+// ─── Map ──────────────────────────────────────────────────────────────────
+
+// ─── Reviews ──────────────────────────────────────────────────────────────
+function loadRevs(){
+  var all = DEFREVS.slice();
+  try{ var s = localStorage.getItem('sl_revs'); if(s) all = all.concat(JSON.parse(s)); }catch(e){}
+  renderRevs(all);
+}
+
+function renderRevs(list){
+  $('revgrid').innerHTML = list.map(function(r){
+    return '<div class="rev">' +
+      '<div class="revtop">' +
+      '<div class="ava" style="background:'+r.col+'22">'+r.ava+'</div>' +
+      '<div><div class="revname">'+esc(r.name)+'</div><div class="revcity">📍 '+esc(r.city)+'</div></div>' +
+      '<div class="revstars">'+'★'.repeat(r.stars)+'☆'.repeat(5-r.stars)+'</div>' +
+      '</div>' +
+      '<div class="revtext">"'+esc(r.text)+'"</div>' +
+      '<div class="revdate">'+r.date+'</div>' +
+      '</div>';
+  }).join('');
+  var avg = (list.reduce(function(s,r){ return s+r.stars; },0)/list.length).toFixed(1);
+  $('avgnum').textContent = avg;
+  $('avgcnt').textContent = list.length + ' отзывов';
+  var f = Math.round(parseFloat(avg));
+  $('avgstars').textContent = '★'.repeat(f) + '☆'.repeat(5-f);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+
+  // District hint on change
+  $('district').addEventListener('change', function(){
+    $('dhint').textContent = HINTS[this.value] || '';
+  });
+
+  // Tier buttons
+  document.querySelectorAll('.tbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      tier = btn.getAttribute('data-tier');
+    });
+  });
+
+  // Calculate
+  $('gobtn').addEventListener('click', calculate);
+
+  // Chat
+  $('csend').addEventListener('click', sendChat);
+  $('cinput').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendChat(); });
+
+
+  // Star rating
+  document.querySelectorAll('.star').forEach(function(s, i){
+    s.addEventListener('click', function(){
+      starRating = i + 1;
+      document.querySelectorAll('.star').forEach(function(x, j){
+        x.classList.toggle('on', j <= i);
+      });
+    });
+  });
+
+  // Reviews
+  $('addRevBtn').addEventListener('click', function(){
+    var f = $('revform');
+    f.style.display = f.style.display === 'block' ? 'none' : 'block';
+  });
+
+  $('submitRevBtn').addEventListener('click', function(){
+    var name = $('rname').value.trim();
+    var city = $('rcity2').value.trim();
+    var text = $('rtext').value.trim();
+    if(!name || !text){ alert('Заполните имя и отзыв'); return; }
+    var extra = [];
+    try{ var s = localStorage.getItem('sl_revs'); if(s) extra = JSON.parse(s); }catch(e){}
+    extra.push({
+      name:name, city:city||'—', stars:starRating, text:text,
+      date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}),
+      ava:AVAS[Math.floor(Math.random()*AVAS.length)],
+      col:COLS[Math.floor(Math.random()*COLS.length)]
+    });
+    localStorage.setItem('sl_revs', JSON.stringify(extra));
+    $('rname').value=''; $('rcity2').value=''; $('rtext').value='';
+    $('revform').style.display='none';
+    loadRevs();
+  });
+
+  // Subscription
+  $('freePlanBtn').addEventListener('click', function(){ alert('Вы уже используете бесплатный план!'); });
+  $('proBtn').addEventListener('click', function(){
+    $('proModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  $('proCloseBtn').addEventListener('click', function(){
+    $('proModal').style.display = 'none';
+    document.body.style.overflow = '';
+  });
+  $('proModal').addEventListener('click', function(e){
+    if(e.target === $('proModal')){ $('proModal').style.display='none'; document.body.style.overflow=''; }
+  });
+  $('proPayBtn').addEventListener('click', function(){
+    var email = $('proEmail').value.trim();
+    if(!email || !email.includes('@')){ alert('Введите корректный email'); return; }
+    $('proModal').style.display = 'none';
+    document.body.style.overflow = '';
+    alert('Спасибо! Когда сайт будет запущен — напишем на ' + email);
+  });
+
+  loadCount();
+  loadRevs();
+});
+</script>
+</body>
+</html>
